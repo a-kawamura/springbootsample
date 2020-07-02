@@ -1,0 +1,31 @@
+user: postgres
+pass: postgres
+port: 5432
+
+
+net start postgresql-x64-12
+net stop postgresql-x64-12
+
+
+CREATE ROLE mrs login ENCRYPTED PASSWORD 'mrs' NOSUPERUSER INHERIT NOCREATEDB NOREPLICATION;
+
+CREATE DATABASE mrs WITH OWNER = mrs ENCODING = 'UTF8' TABLESPACE = pg_default LC_COLLATE = 'C' LC_CTYPE = 'C' TEMPLATE = template0 CONNECTION LIMIT = -1;
+
+
+
+【psql】
+exit: \q
+
+【connect db】
+psql -U mrs -d mrs
+
+【check db
+psql -U mrs -l
+
+【commands】
+
+●table list
+\d
+
+●table info
+\d tablename
