@@ -9,6 +9,7 @@ import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -26,11 +27,18 @@ public class DefaultErrorController implements ErrorController {
 
 	@RequestMapping("error")
 	@ResponseBody
-	public String handleError(HttpServletRequest request) {
+	public String handleError(HttpServletRequest request, Model model) {
 		ServletWebRequest webRequest = new ServletWebRequest(request);
 		Map<String, Object> errorAttributes = this.errorAttributes
 				.getErrorAttributes(webRequest,
 						ErrorAttributeOptions.defaults());
+
+		Exception e = (Exception) request.getAttribute("exception");
+		if (e != null) {
+			errorAttributes.put("Exception", e.getClass().getCanonicalName());
+			errorAttributes.put("Exception message", e.getMessage());
+		}
+
 		StringBuilder errorDetails = new StringBuilder();
 		errorAttributes.forEach((attribute, value) -> {
 			errorDetails.append("<tr><td>").append(attribute)

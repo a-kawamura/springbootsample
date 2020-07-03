@@ -38,14 +38,26 @@ public class CheckAlreadyLoginedFilter extends GenericFilterBean {
 		}
 
 		HttpSession session = ((HttpServletRequest) request).getSession(false);
-		SecurityContext context = (SecurityContext) (session
-				.getAttribute("SPRING_SECURITY_CONTEXT"));
+		if (session == null) {
+			chain.doFilter(request, response);
+			return;
+		}
 
-		if (context != null) {
-			request.setAttribute("exception", "Already logined.");
-			request.getRequestDispatcher("/loginForm?error=true")
-					.forward(request, response);
-//			throw new AuthenticationException("Already logined.");
+		try {
+			SecurityContext context = (SecurityContext) (session
+					.getAttribute("SPRING_SECURITY_CONTEXT"));
+
+			if (context != null) {
+				request.setAttribute("exception", "Already logined.");
+				request.getRequestDispatcher("/loginForm?error=true")
+						.forward(request, response);
+				return;
+			}
+		} catch (Exception e) {
+			// ここせ発生したexceptionはAuthenticationFailureHandlerでも補足されず、/errorにも遷移せず、
+			// login画面を再表示してしまうために、ここで/errorへforwardする。
+			request.setAttribute("exception", e);
+			request.getRequestDispatcher("/error").forward(request, response);
 			return;
 		}
 		chain.doFilter(request, response);
