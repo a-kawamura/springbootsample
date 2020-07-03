@@ -13,11 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import mrs.app.login.CheckAlreadyLoginedFilter;
 import mrs.app.login.CustomAuthenticationFailureHandler;
-import mrs.app.login.CustomUsernamePasswordAuthenticationFilter;
 import mrs.domain.service.usesr.ReservationUserDetailsService;
 
 @Configuration
@@ -25,7 +23,8 @@ import mrs.domain.service.usesr.ReservationUserDetailsService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	private static String loginProcessingUrl = "/login";
+	public static final String LOGIN_PROCESS_URL = "/login";
+	public static final String FAILURE_URL = "/loginForm?error=true";
 
 	@Autowired
 	ReservationUserDetailsService userDetailesService;
@@ -42,12 +41,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/js/**", "/css/**", "/login", "/loginForm**")
 				.permitAll().antMatchers("/**").authenticated().and()
 				.formLogin().loginPage("/loginForm")
-				.loginProcessingUrl(loginProcessingUrl)
+				.loginProcessingUrl(LOGIN_PROCESS_URL)
 				.usernameParameter("username").passwordParameter("password")
 				.defaultSuccessUrl("/rooms", true)
 //				.failureUrl("/loginForm?error=true")
-				.failureHandler(customAuthenticationFailureHandler(
-						"/loginForm?error=true"))
+				.failureHandler(customAuthenticationFailureHandler(FAILURE_URL))
 //						"/error"))
 				.permitAll()
 //				.and().logout().invalidateHttpSession(true)
@@ -61,7 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().ignoringAntMatchers("/login", "/loginForm**");
 
 //      failed↓
-		http.addFilterBefore(new CheckAlreadyLoginedFilter(loginProcessingUrl),
+		http.addFilterBefore(new CheckAlreadyLoginedFilter(),
 				UsernamePasswordAuthenticationFilter.class);
 	}
 
@@ -87,13 +85,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return new HttpSessionEventPublisher();
 	}
 
-	public CustomUsernamePasswordAuthenticationFilter authenticationFilter()
-			throws Exception {
-		CustomUsernamePasswordAuthenticationFilter authenticationFilter = new CustomUsernamePasswordAuthenticationFilter();
-		authenticationFilter.setRequiresAuthenticationRequestMatcher(
-				new AntPathRequestMatcher("/login", "POST"));
-		authenticationFilter
-				.setAuthenticationManager(authenticationManagerBean());
-		return authenticationFilter;
-	}
+//	public CustomUsernamePasswordAuthenticationFilter authenticationFilter()
+//			throws Exception {
+//		CustomUsernamePasswordAuthenticationFilter authenticationFilter = new CustomUsernamePasswordAuthenticationFilter();
+//		authenticationFilter.setRequiresAuthenticationRequestMatcher(
+//				new AntPathRequestMatcher("/login", "POST"));
+//		authenticationFilter
+//				.setAuthenticationManager(authenticationManagerBean());
+//		return authenticationFilter;
+//	}
 }

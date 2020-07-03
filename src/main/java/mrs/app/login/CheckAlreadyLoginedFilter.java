@@ -1,5 +1,9 @@
 package mrs.app.login;
 
+import static mrs.config.WebSecurityConfig.FAILURE_URL;
+import static mrs.config.WebSecurityConfig.LOGIN_PROCESS_URL;
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
+
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
@@ -21,18 +25,12 @@ import org.springframework.web.filter.GenericFilterBean;
  */
 public class CheckAlreadyLoginedFilter extends GenericFilterBean {
 
-	private final String loginProcessingUrl;
-
-	public CheckAlreadyLoginedFilter(String loginProcessingUrl) {
-		this.loginProcessingUrl = loginProcessingUrl;
-	}
-
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
 		String requestedUrl = ((HttpServletRequest) request).getRequestURI();
-		if (!requestedUrl.equals(loginProcessingUrl)) {
+		if (!requestedUrl.equals(LOGIN_PROCESS_URL)) {
 			chain.doFilter(request, response);
 			return;
 		}
@@ -45,13 +43,14 @@ public class CheckAlreadyLoginedFilter extends GenericFilterBean {
 
 		try {
 			SecurityContext context = (SecurityContext) (session
-					.getAttribute("SPRING_SECURITY_CONTEXT"));
+					.getAttribute(SPRING_SECURITY_CONTEXT_KEY));
 
 			if (context != null) {
 				request.setAttribute("exception", "Already logined.");
-				request.getRequestDispatcher("/loginForm?error=true")
-						.forward(request, response);
+				request.getRequestDispatcher(FAILURE_URL).forward(request,
+						response);
 				return;
+
 			}
 		} catch (Exception e) {
 			// ここせ発生したexceptionはAuthenticationFailureHandlerでも補足されず、/errorにも遷移せず、
