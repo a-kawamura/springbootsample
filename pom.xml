@@ -36,11 +36,6 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -79,6 +74,41 @@
          -->
          
 	</dependencies>
+
+	<profiles>
+	  <profile>
+	    <id>dev</id>
+	  	<activation>
+	  	  <property>
+	  	  	<name>spring.profiles.active</name>
+	  	  	<value>dev</value>
+	  	  </property>
+	  	</activation>
+    	<dependencies>
+	  	  <dependency>
+    	    <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
+	  </profile>
+	  <profile>
+	    <id>prod</id>
+	  	<activation>
+	  	  <property>
+	  	  	<name>spring.profiles.active</name>
+	  	  	<value>prod</value>
+	  	  </property>
+	  	</activation>
+    	<dependencies>
+  		  <dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+	      </dependency>
+        </dependencies>
+	  </profile>
+	</profiles>
 
 	<!--  <packaging>war</packaging>  -->
 	<packaging>jar</packaging>
