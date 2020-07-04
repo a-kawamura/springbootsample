@@ -79,11 +79,11 @@
 	  <profile>
 	    <id>dev</id>
 	  	<activation>
-	  	  <property>
-	  	  	<name>spring.profiles.active</name>
-	  	  	<value>dev</value>
-	  	  </property>
+          <activeByDefault>true</activeByDefault>
 	  	</activation>
+        <properties>
+          <activatedProperties>dev</activatedProperties>
+        </properties>
     	<dependencies>
 	  	  <dependency>
     	    <groupId>com.h2database</groupId>
@@ -94,12 +94,9 @@
 	  </profile>
 	  <profile>
 	    <id>prod</id>
-	  	<activation>
-	  	  <property>
-	  	  	<name>spring.profiles.active</name>
-	  	  	<value>prod</value>
-	  	  </property>
-	  	</activation>
+        <properties>
+          <activatedProperties>prod</activatedProperties>
+        </properties>
     	<dependencies>
   		  <dependency>
 			<groupId>org.postgresql</groupId>
