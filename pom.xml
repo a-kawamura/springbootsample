@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>springbootsample</groupId>
 	<artifactId>springbootsample</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
 	<name>mrs</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -111,7 +111,7 @@
 	<packaging>jar</packaging>
 	
 	<build>
-		<finalName>${artifactId}</finalName>
+		<finalName>${artifactId}-${version}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
