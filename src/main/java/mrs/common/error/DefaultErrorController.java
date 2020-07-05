@@ -43,7 +43,6 @@ public class DefaultErrorController extends AbstractErrorController {
 	}
 
 	@RequestMapping(path = "error")
-	@ResponseBody
 	public ResponseEntity<Map<String, Object>> handleErrorForRest(
 			HttpServletRequest request, Model model) {
 		Map<String, Object> body = getErrorAttributes(request);
