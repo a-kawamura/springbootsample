@@ -16,6 +16,7 @@
 
 	<properties>
 		<java.version>1.8</java.version>
+        <packaging.type>war</packaging.type>
 	</properties>
 
 	<dependencies>
@@ -63,16 +64,6 @@
 		  <groupId>org.thymeleaf.extras</groupId>
 		  <artifactId>thymeleaf-extras-springsecurity5</artifactId>
 	    </dependency>
-	    
-	    <!--  to build war -->
-	    <!-- 
-	    <dependency>
-   		  <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-          <scope>provided</scope>
-        </dependency>
-         -->
-         
 	</dependencies>
 
 	<profiles>
@@ -105,11 +96,23 @@
 	      </dependency>
         </dependencies>
 	  </profile>
+      <profile>
+        <id>jar</id>
+          <dependencies>
+      	    <dependency>
+         		  <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+                <scope>provided</scope>
+              </dependency>
+          </dependencies>
+          <properties>
+            <packaging.type>jar</packaging.type>
+          </properties>
+      </profile>
 	</profiles>
-
-	<!--  <packaging>war</packaging>  -->
-	<packaging>jar</packaging>
-	
+    
+    <packaging>${packaging.type}</packaging>
+    
 	<build>
 		<finalName>${artifactId}-${ver}</finalName>
 		<plugins>
