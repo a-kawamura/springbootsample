@@ -29,7 +29,7 @@ public class CheckAlreadyLoginedFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
-		String requestedUrl = ((HttpServletRequest) request).getRequestURI();
+		String requestedUrl = ((HttpServletRequest) request).getServletPath();
 		if (!requestedUrl.equals(LOGIN_PROCESS_URL)) {
 			chain.doFilter(request, response);
 			return;
