@@ -15,9 +15,6 @@ public class LoginController {
 	String loginForm(
 			@AuthenticationPrincipal ReservationUserDetails userDetails,
 			Model model) {
-//		if (userDetails != null) {
-//			return "login/doubleLogin";
-//		}
 		return "login/loginForm";
 	}
 
