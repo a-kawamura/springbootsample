@@ -56,8 +56,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //		http.addFilterBefore(authenticationFilter(),
 //				UsernamePasswordAuthenticationFilter.class);
 
-		http.csrf().ignoringAntMatchers("/login", "/loginForm**");
-
 //      failed↓
 		http.addFilterBefore(new CheckAlreadyLoginedFilter(),
 				UsernamePasswordAuthenticationFilter.class);
