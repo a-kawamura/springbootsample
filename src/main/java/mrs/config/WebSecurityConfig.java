@@ -38,20 +38,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.authorizeRequests()
-				.antMatchers("/js/**", "/css/**", "/login", "/loginForm**")
-				.permitAll().antMatchers("/**").authenticated().and()
-				.formLogin().loginPage("/loginForm")
-				.loginProcessingUrl(LOGIN_PROCESS_URL)
+				.antMatchers("/js/**", "/css/**", "/loginForm**").permitAll()
+				.antMatchers("/**").authenticated().and().formLogin()
+				.loginPage("/loginForm").loginProcessingUrl(LOGIN_PROCESS_URL)
 				.usernameParameter("username").passwordParameter("password")
 				.defaultSuccessUrl("/rooms", true)
 //				.failureUrl("/loginForm?error=true")
 				.failureHandler(customAuthenticationFailureHandler(FAILURE_URL))
 //						"/error"))
-				.permitAll()
+				.permitAll().and().exceptionHandling()
+				.accessDeniedPage("/loginForm?accessDenied")
 //				.and().logout().invalidateHttpSession(true)
 //				.logoutUrl("/logout").logoutSuccessUrl("/loginForm").permitAll()
 				.and().sessionManagement().maximumSessions(1)
 				.maxSessionsPreventsLogin(true);
+
+		// failed↓ To think any way to handle session timeout.
+		// .invalidSessionUrl("/loginForm?invalidSession");
 
 //		http.addFilterBefore(authenticationFilter(),
 //				UsernamePasswordAuthenticationFilter.class);
