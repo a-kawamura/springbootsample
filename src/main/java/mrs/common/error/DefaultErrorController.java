@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;
-import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -58,8 +57,7 @@ public class DefaultErrorController extends AbstractErrorController {
 	}
 
 	private Map<String, Object> getErrorAttributes(HttpServletRequest request) {
-		Map<String, Object> errorAttributes = getErrorAttributes(request,
-				ErrorAttributeOptions.defaults());
+		Map<String, Object> errorAttributes = getErrorAttributes(request, true);
 		Exception e = (Exception) request.getAttribute("exception");
 		if (e != null) {
 			if ((e instanceof MethodArgumentTypeMismatchException)
