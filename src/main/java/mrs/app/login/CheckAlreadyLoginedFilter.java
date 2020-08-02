@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
@@ -23,6 +24,7 @@ import org.springframework.web.filter.GenericFilterBean;
  * UsernamePasswordAuthenticationFilterより確実に先に実施したいため、WebSecurityConfigで
  * addBeforeFilterで登録。そのため、urlの指定ができず、doFilter内で/loginのみを対象としている。
  */
+@Component
 public class CheckAlreadyLoginedFilter extends GenericFilterBean {
 
 	@Override
@@ -59,6 +61,8 @@ public class CheckAlreadyLoginedFilter extends GenericFilterBean {
 			request.getRequestDispatcher("/error").forward(request, response);
 			return;
 		}
+
+		session.setAttribute("hostName", request.getServerName());
 		chain.doFilter(request, response);
 
 	}

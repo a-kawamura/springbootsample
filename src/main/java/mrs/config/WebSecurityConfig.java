@@ -38,9 +38,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.authorizeRequests()
-				.antMatchers("/js/**", "/css/**", "/loginForm**").permitAll()
-				.antMatchers("/**").authenticated().and().formLogin()
-				.loginPage("/loginForm").loginProcessingUrl(LOGIN_PROCESS_URL)
+				.antMatchers("/js/**", "/css/**", "/loginForm**", "/logout")
+				.permitAll().antMatchers("/**").authenticated().and()
+				.formLogin().loginPage("/loginForm")
+				.loginProcessingUrl(LOGIN_PROCESS_URL)
 				.usernameParameter("username").passwordParameter("password")
 				.defaultSuccessUrl("/rooms", true)
 //				.failureUrl("/loginForm?error=true")
