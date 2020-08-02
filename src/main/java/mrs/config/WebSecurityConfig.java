@@ -10,12 +10,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import mrs.app.login.CheckAlreadyLoginedFilter;
+import mrs.app.login.CustomAccessDeniedHander;
 import mrs.app.login.CustomAuthenticationFailureHandler;
+import mrs.app.login.CustomLoginUrlAuthenticationEntryPoint;
 import mrs.domain.service.usesr.ReservationUserDetailsService;
 
 @Configuration
@@ -38,24 +42,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.authorizeRequests()
-				.antMatchers("/js/**", "/css/**", "/loginForm**", "/logout")
+				.antMatchers("/js/**", "/css/**", "/loginForm**", "/logout",
+						"/error**")
 				.permitAll().antMatchers("/**").authenticated().and()
 				.formLogin().loginPage("/loginForm")
 				.loginProcessingUrl(LOGIN_PROCESS_URL)
 				.usernameParameter("username").passwordParameter("password")
 				.defaultSuccessUrl("/rooms", true)
-//				.failureUrl("/loginForm?error=true")
 				.failureHandler(customAuthenticationFailureHandler(FAILURE_URL))
-//						"/error"))
-				.permitAll().and().exceptionHandling()
-				.accessDeniedPage("/loginForm?accessDenied")
+				.and().exceptionHandling()
+				.accessDeniedHandler(accessDeniedHandler())
+				.authenticationEntryPoint(authenticationEntryPoint())
 //				.and().logout().invalidateHttpSession(true)
 //				.logoutUrl("/logout").logoutSuccessUrl("/loginForm").permitAll()
 				.and().sessionManagement().maximumSessions(1)
 				.maxSessionsPreventsLogin(true);
-
-		// failed↓ To think any way to handle session timeout.
-		// .invalidSessionUrl("/loginForm?invalidSession");
 
 //		http.addFilterBefore(authenticationFilter(),
 //				UsernamePasswordAuthenticationFilter.class);
@@ -79,12 +80,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+		CustomAccessDeniedHander handler = new CustomAccessDeniedHander();
+		handler.setErrorPage("/loginForm?accessDenied");
+		return handler;
+	}
+
+	@Bean
 	/*
 	 * AbstractSecurityWebApplicationInitializer.enableHttpSessionEventPublisher
 	 * ()でtrueを返しても、Listenerとして登録されないため、ここで登録
 	 */
 	public HttpSessionEventPublisher httpSessionEventPublisher() {
 		return new HttpSessionEventPublisher();
+	}
+
+	@Bean
+	public AuthenticationEntryPoint authenticationEntryPoint() {
+		return new CustomLoginUrlAuthenticationEntryPoint("/loginForm");
 	}
 
 //	public CustomUsernamePasswordAuthenticationFilter authenticationFilter()
