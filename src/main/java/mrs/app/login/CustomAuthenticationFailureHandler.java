@@ -1,18 +1,30 @@
 package mrs.app.login;
 
+import static mrs.common.Constants.AJAX_REQUEST_HEADER_NAME;
+import static mrs.common.Constants.AJAX_REQUEST_HEADER_VALUE;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import mrs.common.error.ApiError;
 
 public class CustomAuthenticationFailureHandler
 		implements AuthenticationFailureHandler {
 
 	private final String failureUrl;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 //	private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -35,7 +47,15 @@ public class CustomAuthenticationFailureHandler
 //		response.getOutputStream()
 //				.println(objectMapper.writeValueAsString(data));
 
-		request.setAttribute("exception", exception);
+		if (AJAX_REQUEST_HEADER_VALUE
+				.equals(request.getHeader(AJAX_REQUEST_HEADER_NAME))) {
+			response.sendError(HttpStatus.UNAUTHORIZED.value(),
+					objectMapper.writeValueAsString(new ApiError(
+							HttpStatus.UNAUTHORIZED.getReasonPhrase())));
+			return;
+		}
+
+		request.setAttribute("errorMessage", exception.getMessage());
 		request.getRequestDispatcher(failureUrl).forward(request, response);
 	}
 

@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorCon
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
@@ -20,9 +19,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Controller
-public class DefaultErrorController extends AbstractErrorController {
+public class GlobalErrorController extends AbstractErrorController {
 
-	public DefaultErrorController(ErrorAttributes errorAttributes) {
+	public GlobalErrorController(ErrorAttributes errorAttributes) {
 		super(errorAttributes);
 	}
 
@@ -31,7 +30,7 @@ public class DefaultErrorController extends AbstractErrorController {
 		return "/error";
 	}
 
-	@RequestMapping(path = "error", produces = MediaType.TEXT_HTML_VALUE)
+	@RequestMapping(path = "/error", produces = MediaType.TEXT_HTML_VALUE)
 	@ResponseBody
 	public String handleError(HttpServletRequest request,
 			HttpServletResponse response, Model model) {
@@ -47,13 +46,6 @@ public class DefaultErrorController extends AbstractErrorController {
 				"<html><head><style>td{vertical-align:top;border:solid 1px #666;}</style>"
 						+ "</head><body><h2>Error Page</h2><table>%s</table></body></html>",
 				errorDetails.toString());
-	}
-
-	@RequestMapping(path = "error")
-	public ResponseEntity<Map<String, Object>> handleErrorForRest(
-			HttpServletRequest request, Model model) {
-		Map<String, Object> body = getErrorAttributes(request);
-		return new ResponseEntity<>(body, getStatus(request));
 	}
 
 	private Map<String, Object> getErrorAttributes(HttpServletRequest request) {

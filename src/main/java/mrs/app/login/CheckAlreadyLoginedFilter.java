@@ -1,5 +1,7 @@
 package mrs.app.login;
 
+import static mrs.common.Constants.AJAX_REQUEST_HEADER_NAME;
+import static mrs.common.Constants.AJAX_REQUEST_HEADER_VALUE;
 import static mrs.config.WebSecurityConfig.FAILURE_URL;
 import static mrs.config.WebSecurityConfig.LOGIN_PROCESS_URL;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
@@ -11,11 +13,19 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import mrs.common.error.ApiError;
+import mrs.common.error.GlobalExceptionHandler;
 
 /**
  * 同一ブラウザでの重複ログイン防止(同一ブラウザで重複ログインが可能であると、<br/>
@@ -26,6 +36,9 @@ import org.springframework.web.filter.GenericFilterBean;
  */
 @Component
 public class CheckAlreadyLoginedFilter extends GenericFilterBean {
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -48,16 +61,25 @@ public class CheckAlreadyLoginedFilter extends GenericFilterBean {
 					.getAttribute(SPRING_SECURITY_CONTEXT_KEY));
 
 			if (context != null) {
-				request.setAttribute("exception", "Already logined.");
+				if (AJAX_REQUEST_HEADER_VALUE
+						.equals(((HttpServletRequest) request)
+								.getHeader(AJAX_REQUEST_HEADER_NAME))) {
+					((HttpServletResponse) response).sendError(
+							HttpStatus.FORBIDDEN.value(),
+							objectMapper.writeValueAsString(new ApiError(
+									HttpStatus.FORBIDDEN.getReasonPhrase())));
+					return;
+				}
+				request.setAttribute("errorMessage", "XXX0001");
 				request.getRequestDispatcher(FAILURE_URL).forward(request,
 						response);
 				return;
-
 			}
 		} catch (Exception e) {
 			// ここせ発生したexceptionはAuthenticationFailureHandlerでも補足されず、/errorにも遷移せず、
-			// login画面を再表示してしまうために、ここで/errorへforwardする。
-			request.setAttribute("exception", e);
+			// login画面を再表示してしまうために、ここで/rrorへforwardする。
+			request.setAttribute(
+					GlobalExceptionHandler.APPLICATION_EXCEPTION_KEY, e);
 			request.getRequestDispatcher("/error").forward(request, response);
 			return;
 		}

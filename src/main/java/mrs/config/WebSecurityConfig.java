@@ -29,6 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	public static final String LOGIN_PROCESS_URL = "/login";
 	public static final String FAILURE_URL = "/loginForm?error=true";
+	public static final String ERROR_URL = "/error";
 
 	@Autowired
 	ReservationUserDetailsService userDetailesService;
@@ -99,14 +100,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public AuthenticationEntryPoint authenticationEntryPoint() {
 		return new CustomLoginUrlAuthenticationEntryPoint("/loginForm");
 	}
-
-//	public CustomUsernamePasswordAuthenticationFilter authenticationFilter()
-//			throws Exception {
-//		CustomUsernamePasswordAuthenticationFilter authenticationFilter = new CustomUsernamePasswordAuthenticationFilter();
-//		authenticationFilter.setRequiresAuthenticationRequestMatcher(
-//				new AntPathRequestMatcher("/login", "POST"));
-//		authenticationFilter
-//				.setAuthenticationManager(authenticationManagerBean());
-//		return authenticationFilter;
-//	}
 }

@@ -1,5 +1,8 @@
 package mrs.app.login;
 
+import static mrs.common.Constants.AJAX_REQUEST_HEADER_NAME;
+import static mrs.common.Constants.AJAX_REQUEST_HEADER_VALUE;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -13,10 +16,17 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.csrf.MissingCsrfTokenException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import mrs.common.error.ApiError;
+
 public class CustomAccessDeniedHander extends AccessDeniedHandlerImpl {
 
 	@Autowired
 	AuthenticationEntryPoint authenticationEntryPoint;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response,
@@ -26,10 +36,11 @@ public class CustomAccessDeniedHander extends AccessDeniedHandlerImpl {
 		if (accessDeniedException instanceof MissingCsrfTokenException) {
 			authenticationEntryPoint.commence(request, response, null);
 		} else {
-			if ("XMLHttpRequest"
-					.equals(request.getHeader("X-Requested-With"))) {
+			if (AJAX_REQUEST_HEADER_VALUE
+					.equals(request.getHeader(AJAX_REQUEST_HEADER_NAME))) {
 				response.sendError(HttpStatus.FORBIDDEN.value(),
-						HttpStatus.FORBIDDEN.getReasonPhrase());
+						objectMapper.writeValueAsString(new ApiError(
+								HttpStatus.FORBIDDEN.getReasonPhrase())));
 			} else {
 				super.handle(request, response, accessDeniedException);
 			}
