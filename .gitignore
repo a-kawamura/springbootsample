@@ -34,3 +34,4 @@ build/
 ### add ###
 h2db/
 cookie.txt
+keystore.p12

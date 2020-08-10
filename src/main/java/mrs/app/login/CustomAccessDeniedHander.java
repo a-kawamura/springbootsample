@@ -19,11 +19,15 @@ import org.springframework.security.web.csrf.MissingCsrfTokenException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mrs.common.error.ApiError;
+import mrs.common.error.HttpStatusCodeMessageMap;
 
 public class CustomAccessDeniedHander extends AccessDeniedHandlerImpl {
 
 	@Autowired
 	AuthenticationEntryPoint authenticationEntryPoint;
+
+	@Autowired
+	HttpStatusCodeMessageMap httpStatusCodeMessageMap;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -40,7 +44,8 @@ public class CustomAccessDeniedHander extends AccessDeniedHandlerImpl {
 					.equals(request.getHeader(AJAX_REQUEST_HEADER_NAME))) {
 				response.sendError(HttpStatus.FORBIDDEN.value(),
 						objectMapper.writeValueAsString(new ApiError(
-								HttpStatus.FORBIDDEN.getReasonPhrase())));
+								httpStatusCodeMessageMap.getMessage(
+										HttpStatus.FORBIDDEN.value()))));
 			} else {
 				super.handle(request, response, accessDeniedException);
 			}

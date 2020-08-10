@@ -7,8 +7,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 @SpringBootApplication
 
 // In case to make jar
-// public class MrsApplication {
-//	
+//public class MrsApplication {
+//
 //	public static void main(String[] args) {
 //		SpringApplication.run(MrsApplication.class, args);
 //	}

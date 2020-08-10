@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta th:replace="common/csrfheader::csrfheader">
+    <meta charset="UTF-8">
+    <title></title>
+  </head>
+  <body　 style="text-align:center">
+    <h3>エラーページ</h3>
+    <br/>
+    <br/>
+    <h3><span style="color: red" th:text="${errorMessage}">システムエラーが発生しました。</span></p></h3>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <form th:action="@{/logout}" method="POST">
+      <button type="submit">ログイン画面</button>
+    </form>
+    
+  
+  </body>
+</html>

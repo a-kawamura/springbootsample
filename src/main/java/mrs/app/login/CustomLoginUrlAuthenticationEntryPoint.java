@@ -17,12 +17,16 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mrs.common.error.ApiError;
+import mrs.common.error.HttpStatusCodeMessageMap;
 
 public class CustomLoginUrlAuthenticationEntryPoint
 		extends LoginUrlAuthenticationEntryPoint {
 
 	@Autowired
-	private ObjectMapper objectMapper;
+	ObjectMapper objectMapper;
+
+	@Autowired
+	HttpStatusCodeMessageMap httpStatusCodeMessageMap;
 
 	public CustomLoginUrlAuthenticationEntryPoint(String loginFormUrl) {
 		super(loginFormUrl);
@@ -58,8 +62,9 @@ public class CustomLoginUrlAuthenticationEntryPoint
 		if (AJAX_REQUEST_HEADER_VALUE
 				.equals(request.getHeader(AJAX_REQUEST_HEADER_NAME))) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			response.getWriter().print(objectMapper.writeValueAsString(
-					new ApiError(HttpStatus.FORBIDDEN.getReasonPhrase())));
+			response.getWriter().print(objectMapper
+					.writeValueAsString(new ApiError(httpStatusCodeMessageMap
+							.getMessage(HttpStatus.FORBIDDEN.value()))));
 			return;
 		}
 		super.commence(request, response, authException);

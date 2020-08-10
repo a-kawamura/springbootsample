@@ -23,9 +23,8 @@ public class RestRoomsController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	List<ReservableRoom> listRooms(Model model) {
-		throw new RuntimeException("XXX0002");
-//		LocalDate today = LocalDate.now();
-//		return roomService.findReservableRooms(today);
+		LocalDate today = LocalDate.now();
+		return roomService.findReservableRooms(today);
 	}
 
 	@RequestMapping(path = "{date}", method = RequestMethod.GET)

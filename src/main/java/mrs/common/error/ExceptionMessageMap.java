@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -23,6 +23,7 @@ public class ExceptionMessageMap {
 				private static final long serialVersionUID = 1L;
 
 				{
+					put(AuthenticationException.class, "XXX0004");
 					put(AlreadyLoginedException.class, "XXX0001");
 					put(MethodArgumentNotValidException.class, "XXX0003");
 					put(RuntimeException.class, "XXX0002");
@@ -31,16 +32,13 @@ public class ExceptionMessageMap {
 			});
 
 	public String getMessage(Exception ex) {
-		String errorCode = messageMappings.get(ex.getClass());
-		if (errorCode == null) {
-			errorCode = "XXX9999";
-		}
-		return messageSource.getMessage(errorCode, null, Locale.JAPAN);
+		return messageSource.getMessage(getErrorCode(ex), null, Locale.JAPAN);
 	}
 
 	public String getErrorCode(Exception ex) {
-		return Optional.ofNullable(messageMappings.get(ex.getClass()))
-				.orElse("XXX9999");
+		return messageMappings.entrySet().stream()
+				.filter(entry -> entry.getKey().isAssignableFrom(ex.getClass()))
+				.findFirst().map(Map.Entry::getValue).orElse("XXX9999");
 	}
 
 }

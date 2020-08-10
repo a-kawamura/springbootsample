@@ -15,6 +15,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.web.filter.GenericFilterBean;
 
 import mrs.app.login.CheckAlreadyLoginedFilter;
 import mrs.app.login.CustomAccessDeniedHander;
@@ -63,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //				UsernamePasswordAuthenticationFilter.class);
 
 //      failed↓
-		http.addFilterBefore(new CheckAlreadyLoginedFilter(),
+		http.addFilterBefore(checkAlreadyLoginedFilter(),
 				UsernamePasswordAuthenticationFilter.class);
 	}
 
@@ -72,6 +73,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			throws Exception {
 		auth.userDetailsService(userDetailesService)
 				.passwordEncoder(passwordEncoder());
+	}
+
+	@Bean
+	public GenericFilterBean checkAlreadyLoginedFilter() {
+		return new CheckAlreadyLoginedFilter();
 	}
 
 	@Bean

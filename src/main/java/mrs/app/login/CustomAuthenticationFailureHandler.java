@@ -2,6 +2,7 @@ package mrs.app.login;
 
 import static mrs.common.Constants.AJAX_REQUEST_HEADER_NAME;
 import static mrs.common.Constants.AJAX_REQUEST_HEADER_VALUE;
+import static mrs.common.Constants.ERROR_MESSAGE_KEY;
 
 import java.io.IOException;
 
@@ -17,11 +18,18 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mrs.common.error.ApiError;
+import mrs.common.error.ExceptionMessageMap;
+import mrs.common.error.HttpStatusCodeMessageMap;
 
 public class CustomAuthenticationFailureHandler
 		implements AuthenticationFailureHandler {
 
 	private final String failureUrl;
+
+	@Autowired
+	private ExceptionMessageMap exceptionMessageMap;
+	@Autowired
+	private HttpStatusCodeMessageMap httpStatusCodeMessageMap;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -49,13 +57,14 @@ public class CustomAuthenticationFailureHandler
 
 		if (AJAX_REQUEST_HEADER_VALUE
 				.equals(request.getHeader(AJAX_REQUEST_HEADER_NAME))) {
-			response.sendError(HttpStatus.UNAUTHORIZED.value(),
-					objectMapper.writeValueAsString(new ApiError(
-							HttpStatus.UNAUTHORIZED.getReasonPhrase())));
+			response.sendError(HttpStatus.UNAUTHORIZED.value(), objectMapper
+					.writeValueAsString(new ApiError(httpStatusCodeMessageMap
+							.getMessage(HttpStatus.UNAUTHORIZED.value()))));
 			return;
 		}
 
-		request.setAttribute("errorMessage", exception.getMessage());
+		request.setAttribute(ERROR_MESSAGE_KEY,
+				exceptionMessageMap.getMessage(exception));
 		request.getRequestDispatcher(failureUrl).forward(request, response);
 	}
 

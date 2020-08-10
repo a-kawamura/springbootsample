@@ -5,6 +5,8 @@ import java.time.LocalDate;
 
 import javax.persistence.Embeddable;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @Data
@@ -15,6 +17,7 @@ public class ReservableRoomId implements Serializable {
 
 	private Integer roomId;
 
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate reservedDate;
 
 	public ReservableRoomId(Integer roomId, LocalDate reservedDate) {

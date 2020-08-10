@@ -2,11 +2,13 @@ package mrs.app.login;
 
 import static mrs.common.Constants.AJAX_REQUEST_HEADER_NAME;
 import static mrs.common.Constants.AJAX_REQUEST_HEADER_VALUE;
+import static mrs.common.Constants.ERROR_MESSAGE_KEY;
 import static mrs.config.WebSecurityConfig.FAILURE_URL;
 import static mrs.config.WebSecurityConfig.LOGIN_PROCESS_URL;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,15 +19,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mrs.common.error.ApiError;
 import mrs.common.error.GlobalExceptionHandler;
+import mrs.common.error.HttpStatusCodeMessageMap;
 
 /**
  * 同一ブラウザでの重複ログイン防止(同一ブラウザで重複ログインが可能であると、<br/>
@@ -34,8 +37,13 @@ import mrs.common.error.GlobalExceptionHandler;
  * UsernamePasswordAuthenticationFilterより確実に先に実施したいため、WebSecurityConfigで
  * addBeforeFilterで登録。そのため、urlの指定ができず、doFilter内で/loginのみを対象としている。
  */
-@Component
 public class CheckAlreadyLoginedFilter extends GenericFilterBean {
+
+	@Autowired
+	MessageSource messageSource;
+
+	@Autowired
+	HttpStatusCodeMessageMap httpStatusCodeMessageMap;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -67,10 +75,12 @@ public class CheckAlreadyLoginedFilter extends GenericFilterBean {
 					((HttpServletResponse) response).sendError(
 							HttpStatus.FORBIDDEN.value(),
 							objectMapper.writeValueAsString(new ApiError(
-									HttpStatus.FORBIDDEN.getReasonPhrase())));
+									httpStatusCodeMessageMap.getMessage(
+											HttpStatus.FORBIDDEN.value()))));
 					return;
 				}
-				request.setAttribute("errorMessage", "XXX0001");
+				request.setAttribute(ERROR_MESSAGE_KEY, messageSource
+						.getMessage("XXX0001", null, Locale.JAPAN));
 				request.getRequestDispatcher(FAILURE_URL).forward(request,
 						response);
 				return;

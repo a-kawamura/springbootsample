@@ -1,25 +1,33 @@
 package mrs.common.error;
 
-import java.util.Map;
+import static mrs.common.Constants.ERROR_MESSAGE_KEY;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Controller
 public class GlobalErrorController extends AbstractErrorController {
+
+	@Autowired
+	ExceptionMessageMap exceptionMessageMap;
+
+	@Autowired
+	HttpStatusCodeMessageMap httpStatusMessageMap;
+
+	private static final String ERROR_PAGE_PATH = "/error/errorPage";
+
+	private final Logger log = LoggerFactory
+			.getLogger(GlobalErrorController.class);
 
 	public GlobalErrorController(ErrorAttributes errorAttributes) {
 		super(errorAttributes);
@@ -31,46 +39,28 @@ public class GlobalErrorController extends AbstractErrorController {
 	}
 
 	@RequestMapping(path = "/error", produces = MediaType.TEXT_HTML_VALUE)
-	@ResponseBody
-	public String handleError(HttpServletRequest request,
-			HttpServletResponse response, Model model) {
-		Map<String, Object> errorAttributes = getErrorAttributes(request);
-		StringBuilder errorDetails = new StringBuilder();
-		errorAttributes.forEach((attribute, value) -> {
-			errorDetails.append("<tr><td>").append(attribute)
-					.append("</td><td><pre>").append(value)
-					.append("</pre></td></tr>");
-		});
-		response.setStatus(getStatus(request).value());
-		return String.format(
-				"<html><head><style>td{vertical-align:top;border:solid 1px #666;}</style>"
-						+ "</head><body><h2>Error Page</h2><table>%s</table></body></html>",
-				errorDetails.toString());
-	}
+	public String handleError(HttpServletRequest request, Model model) {
 
-	private Map<String, Object> getErrorAttributes(HttpServletRequest request) {
-		Map<String, Object> errorAttributes = getErrorAttributes(request, true);
-		Exception e = (Exception) request.getAttribute("exception");
-		if (e != null) {
-			if ((e instanceof MethodArgumentTypeMismatchException)
-					|| (e instanceof MethodArgumentNotValidException)
-					|| (e instanceof BindException)) {
-				request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
-						HttpStatus.BAD_REQUEST.value());
-				errorAttributes.put("status", HttpStatus.BAD_REQUEST.value());
-				errorAttributes.put("error",
-						HttpStatus.BAD_REQUEST.getReasonPhrase());
-			} else {
-				request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
-						HttpStatus.INTERNAL_SERVER_ERROR.value());
-				errorAttributes.put("status",
-						HttpStatus.INTERNAL_SERVER_ERROR.value());
-				errorAttributes.put("error",
-						HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-			}
-			errorAttributes.put("exception", e.getClass().getCanonicalName());
-			errorAttributes.put("message", e.getMessage());
+		String message;
+		Exception ex = (Exception) request
+				.getAttribute(GlobalExceptionHandler.APPLICATION_EXCEPTION_KEY);
+		if (ex == null) {
+			ex = (Exception) request
+					.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 		}
-		return errorAttributes;
+		if (ex != null) {
+			message = exceptionMessageMap.getMessage(ex);
+			log.error(message, ex);
+			model.addAttribute(ERROR_MESSAGE_KEY, message);
+			return ERROR_PAGE_PATH;
+		}
+
+		Integer statusCode = (Integer) request
+				.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+
+		log.error("Http Status Code: " + statusCode);
+		model.addAttribute(ERROR_MESSAGE_KEY,
+				httpStatusMessageMap.getMessage(statusCode));
+		return ERROR_PAGE_PATH;
 	}
 }

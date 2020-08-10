@@ -1,12 +1,11 @@
 package mrs.common.error;
 
-import java.util.Arrays;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +16,12 @@ public class GlobalErrorRestController {
 	@Autowired
 	ExceptionMessageMap exceptionMessageMap;
 
+	@Autowired
+	HttpStatusCodeMessageMap httpStatusCodeMessgeMap;
+
+	private final Logger log = LoggerFactory
+			.getLogger(GlobalErrorRestController.class);
+
 	@RequestMapping(path = "/error")
 	public ApiError handleErrorForRest(HttpServletRequest request,
 			Model model) {
@@ -24,24 +29,19 @@ public class GlobalErrorRestController {
 		String message;
 		Exception ex = (Exception) request
 				.getAttribute(GlobalExceptionHandler.APPLICATION_EXCEPTION_KEY);
-
-		if (ex != null) {
-			return new ApiError(exceptionMessageMap.getMessage(ex));
+		if (ex == null) {
+			ex = (Exception) request
+					.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 		}
-		ex = (Exception) request
-				.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 		if (ex != null) {
-			return new ApiError(ex.getMessage());
+			message = exceptionMessageMap.getMessage(ex);
+			log.error(message, ex);
+			return new ApiError(message);
 		}
 
 		Integer statusCode = (Integer) request
 				.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-		if (Arrays.asList(HttpStatus.values()).stream()
-				.anyMatch(status -> status.value() == statusCode)) {
-			message = HttpStatus.valueOf(statusCode).getReasonPhrase();
-		} else {
-			message = "Custom error (" + statusCode + ") is occured.";
-		}
+		message = httpStatusCodeMessgeMap.getMessage(statusCode);
 		return new ApiError(message);
 	}
 

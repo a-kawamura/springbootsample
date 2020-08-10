@@ -7,7 +7,7 @@
   </head>
   <body>
     <h3>ログインフォーム</h3>
-    <p th:if="${param.error}">Error! <span th:text="#{${errorMessage}}"></span></p>
+    <p th:if="${param.error}">Error! <span th:text="${errorMessage}"></span></p>
     <p style="color: red" th:if="${param.timeout}">長時間操作が無かったなどの理由でセッションが無効となっています。ログインをしてください。</p>
     <p style="color: red" th:if="${param.accessDenied}">ページにアクセスできません(認可エラー)</p>
     <form th:action="@{/login}" method="POST">

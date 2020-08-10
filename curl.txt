@@ -1,0 +1,5 @@
+curl -v  -H "X-Requested-With:XMLHttpRequest" -c cookie.txt -k https://localhost:8443/springbootsample/loginForm
+
+curl -v -XPOST -H "X-Requested-With:XMLHttpRequest"  -H "X-CSRF-TOKEN:94b691fa-7c2d-40e0-90bc-edf3bd59cd16" -d username=bbbb -d password=demo -b cookie.txt -c cookie.txt -k https://localhost:8443/springbootsample/login
+
+curl -v -H "X-Requested-With:XMLHttpRequest" -b cookie.txt -k https://localhost:8443/springbootsample/restRooms 

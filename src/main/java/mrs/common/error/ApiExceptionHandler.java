@@ -33,8 +33,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 				.addDetail(e.getObjectName(), getMessage(e, request)));
 		ex.getBindingResult().getFieldErrors().stream().forEach(
 				e -> apiError.addDetail(e.getField(), getMessage(e, request)));
-		return super.handleExceptionInternal(ex, apiError, headers, status,
-				request);
+		return super.handleExceptionInternal(ex, apiError, headers,
+				HttpStatus.BAD_REQUEST, request);
 	}
 
 	private String getMessage(MessageSourceResolvable resolvable,
