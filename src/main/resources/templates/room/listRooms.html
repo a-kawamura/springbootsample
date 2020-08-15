@@ -6,21 +6,18 @@
     <title th:text="|${#temporals.format(date, 'yyyy/M/d')}の会議室|">2016/5/20の会議室</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script>
-    	$(function () {
-    		$.ajax(
-    				{
-    					url:"restRooms",
-	    				type:"get",		
-    					data: "",
-    					dataType:"json", 
-    					timespan:1000 		
-    				}).done(function(data, textStatus, jqXHR) {
-    					console.log("ajax done! status: " + textStatus);
-    					console.log("data" + JSON.stringify(data));
-    				}).fail(function(jqXHR, textStatus, errorThrown ) {
-    					console.log("ajax done! " + jqXHR.responseText);
-    				})
-    	});
+     $(function () {
+      let parameter = $("").serialize();
+      $.getJSON("restRooms", parameter)
+        .done(function(data, textStatus, jqXHR) {
+          console.log("ajax done! status: " + textStatus);
+          console.log("data " + JSON.stringify(data));
+        }).fail(function(jqXHR, textStatus, errorThrown ) {
+          console.log("ajax error! " + jqXHR.responseText);
+        }).always(function (){
+          console.log("completed");
+        })
+     });
     </script>
     
   </head>
@@ -30,9 +27,9 @@
     <span th:text="|${#temporals.format(date, 'yyyy/M/d')}の会議室|">2016/5/20の会議室</span>
     <a th:href="@{'/rooms/' + ${date.plusDays(1)}}">翌日 &gt;</a>
     <ul>
-    	<li th:each="room: ${rooms}">
-    		<a th:href="@{'/reservations/' + ${date} + '/' + ${room.meetingRoom.roomId}}"
-    		   th:text="${room.meetingRoom.roomName}"></a>
+     <li th:each="room: ${rooms}">
+      <a th:href="@{'/reservations/' + ${date} + '/' + ${room.meetingRoom.roomId}}"
+         th:text="${room.meetingRoom.roomName}"></a>
     </ul>
     <form th:action="@{/logout}" method="POST">
       <button>ログアウト</button>
