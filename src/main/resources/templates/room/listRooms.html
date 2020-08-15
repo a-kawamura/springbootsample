@@ -4,6 +4,25 @@
     <meta th:replace="common/csrfheader::csrfheader">
     <meta charset="UTF-8">
     <title th:text="|${#temporals.format(date, 'yyyy/M/d')}の会議室|">2016/5/20の会議室</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+    	$(function () {
+    		$.ajax(
+    				{
+    					url:"restRooms",
+	    				type:"get",		
+    					data: "",
+    					dataType:"json", 
+    					timespan:1000 		
+    				}).done(function(data, textStatus, jqXHR) {
+    					console.log("ajax done! status: " + textStatus);
+    					console.log("data" + JSON.stringify(data));
+    				}).fail(function(jqXHR, textStatus, errorThrown ) {
+    					console.log("ajax done! " + jqXHR.responseText);
+    				})
+    	});
+    </script>
+    
   </head>
   <body>
     <h3>会議室</h3>
