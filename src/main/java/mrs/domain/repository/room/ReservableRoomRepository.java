@@ -19,8 +19,10 @@ public interface ReservableRoomRepository
 	ReservableRoom findOneForUpdateByReservableRoomId(
 			ReservableRoomId reservableRoomId);
 
-	@Query("SELECT DISTINCT x FROM ReservableRoom x LEFT JOIN FETCH x.meetingRoom "
-			+ "WHERE x.reservableRoomId.reservedDate = :reservedDate ORDER BY x.reservableRoomId ASC")
+	@Query(value = "SELECT * FROM reservable_room res LEFT JOIN meeting_room me ON res.room_id = me.room_id "
+			+ "WHERE res.reserved_date = :reservedDate ORDER BY reserved_date, room_id ASC", nativeQuery = true)
+//	@Query("SELECT DISTINCT x FROM ReservableRoom x LEFT JOIN FETCH x.meetingRoom "
+//			+ "WHERE x.reservableRoomId.reservedDate = :reservedDate ORDER BY x.reservableRoomId ASC")
 	List<ReservableRoom> findByReservableRoomId_reservedDateOrderByReservableRoomId_roomIdAsc(
 			LocalDate reservedDate);
 
