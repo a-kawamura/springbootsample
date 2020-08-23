@@ -30,4 +30,9 @@ public class ReservableRoom implements Serializable {
 
 	public ReservableRoom() {
 	}
+
+	@Override
+	public String toString() {
+		return reservableRoomId.toString();
+	}
 }
