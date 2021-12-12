@@ -28,82 +28,82 @@ import mrs.domain.service.usesr.ReservationUserDetailsService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	public static final String LOGIN_PROCESS_URL = "/login";
-	public static final String FAILURE_URL = "/loginForm?error=true";
-	public static final String ERROR_URL = "/error";
+    public static final String LOGIN_PROCESS_URL = "/login";
+    public static final String FAILURE_URL = "/loginForm?error=true";
+    public static final String ERROR_URL = "/error";
 
-	@Autowired
-	ReservationUserDetailsService userDetailesService;
+    @Autowired
+    ReservationUserDetailsService userDetailesService;
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
 
-		http.authorizeRequests()
-				.antMatchers("/js/**", "/css/**", "/loginForm**", "/logout",
-						"/error**")
-				.permitAll().antMatchers("/**").authenticated().and()
-				.formLogin().loginPage("/loginForm")
-				.loginProcessingUrl(LOGIN_PROCESS_URL)
-				.usernameParameter("username").passwordParameter("password")
-				.defaultSuccessUrl("/rooms", true)
-				.failureHandler(customAuthenticationFailureHandler(FAILURE_URL))
-				.and().exceptionHandling()
-				.accessDeniedHandler(accessDeniedHandler())
-				.authenticationEntryPoint(authenticationEntryPoint())
+        http.authorizeRequests()
+                .antMatchers("/js/**", "/css/**", "/loginForm**", "/logout",
+                        "/error**", "/swagger-ui.html")
+                .permitAll().antMatchers("/**").authenticated().and()
+                .formLogin().loginPage("/loginForm")
+                .loginProcessingUrl(LOGIN_PROCESS_URL)
+                .usernameParameter("username").passwordParameter("password")
+                .defaultSuccessUrl("/rooms", true)
+                .failureHandler(customAuthenticationFailureHandler(FAILURE_URL))
+                .and().exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler())
+                .authenticationEntryPoint(authenticationEntryPoint())
 //				.and().logout().invalidateHttpSession(true)
 //				.logoutUrl("/logout").logoutSuccessUrl("/loginForm").permitAll()
-				.and().sessionManagement().maximumSessions(1)
-				.maxSessionsPreventsLogin(true);
+                .and().sessionManagement().maximumSessions(1)
+                .maxSessionsPreventsLogin(true);
 
 //		http.addFilterBefore(authenticationFilter(),
 //				UsernamePasswordAuthenticationFilter.class);
 
 //      failed↓
-		http.addFilterBefore(checkAlreadyLoginedFilter(),
-				UsernamePasswordAuthenticationFilter.class);
-	}
+        http.addFilterBefore(checkAlreadyLoginedFilter(),
+                UsernamePasswordAuthenticationFilter.class);
+    }
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth)
-			throws Exception {
-		auth.userDetailsService(userDetailesService)
-				.passwordEncoder(passwordEncoder());
-	}
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth)
+            throws Exception {
+        auth.userDetailsService(userDetailesService)
+                .passwordEncoder(passwordEncoder());
+    }
 
-	@Bean
-	public GenericFilterBean checkAlreadyLoginedFilter() {
-		return new CheckAlreadyLoginedFilter();
-	}
+    @Bean
+    public GenericFilterBean checkAlreadyLoginedFilter() {
+        return new CheckAlreadyLoginedFilter();
+    }
 
-	@Bean
-	public AuthenticationFailureHandler customAuthenticationFailureHandler(
-			String failureUrl) {
-		return new CustomAuthenticationFailureHandler(failureUrl);
-	}
+    @Bean
+    public AuthenticationFailureHandler customAuthenticationFailureHandler(
+            String failureUrl) {
+        return new CustomAuthenticationFailureHandler(failureUrl);
+    }
 
-	@Bean
-	public AccessDeniedHandler accessDeniedHandler() {
-		CustomAccessDeniedHander handler = new CustomAccessDeniedHander();
-		handler.setErrorPage("/loginForm?accessDenied");
-		return handler;
-	}
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        CustomAccessDeniedHander handler = new CustomAccessDeniedHander();
+        handler.setErrorPage("/loginForm?accessDenied");
+        return handler;
+    }
 
-	@Bean
-	/*
-	 * AbstractSecurityWebApplicationInitializer.enableHttpSessionEventPublisher
-	 * ()でtrueを返しても、Listenerとして登録されないため、ここで登録
-	 */
-	public HttpSessionEventPublisher httpSessionEventPublisher() {
-		return new HttpSessionEventPublisher();
-	}
+    @Bean
+    /*
+     * AbstractSecurityWebApplicationInitializer.enableHttpSessionEventPublisher
+     * ()でtrueを返しても、Listenerとして登録されないため、ここで登録
+     */
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
 
-	@Bean
-	public AuthenticationEntryPoint authenticationEntryPoint() {
-		return new CustomLoginUrlAuthenticationEntryPoint("/loginForm");
-	}
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new CustomLoginUrlAuthenticationEntryPoint("/loginForm");
+    }
 }

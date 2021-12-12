@@ -1,0 +1,8 @@
+ログインしてから
+https://localhost:8443/springbootsample/swagger-ui.html
+でdocument表示可能。
+
+問題点は下記。
+1. loginしなくても表示できるはずなのに。
+2. documentにspring securityの表示がない。
+
