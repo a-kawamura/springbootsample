@@ -45,7 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers("/js/**", "/css/**", "/loginForm**", "/logout",
-                        "/error**", "/swagger-ui.html")
+                        "/error**", "/swagger-ui/**", "/swagger-ui.html", "/v3/**")
                 .permitAll().antMatchers("/**").authenticated().and()
                 .formLogin().loginPage("/loginForm")
                 .loginProcessingUrl(LOGIN_PROCESS_URL)
