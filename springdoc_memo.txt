@@ -5,7 +5,4 @@ https://localhost:8443/springbootsample/swagger-ui.html
 https://localhost:8443/springbootsample/v3/api-docs.yml
 でymlファイルをdownload
 
-問題点は下記。
-1. loginしなくても表示できるはずなのに。
-2. documentにspring securityの表示がない。
 
